@@ -1,0 +1,27 @@
+{
+    "manifest_version": 2,
+    "name": "Hands Up!",
+    "description": "Tools for managing meetings in Google Meet--raise your hand to speak, send emoji reactions",
+    "version": "1.0",
+    "homepage_url": "https://www.fullstory.com/",
+    "icons": {
+        "16": "handsup16.png",
+        "32": "handsup32.png",
+        "48": "handsup48.png",
+        "128": "handsup128.png"
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://meet.google.com/*"],
+            "js": ["content.js"]
+        }
+    ],
+    "options_ui": {
+        "page": "options.html",
+        "open_in_tab": false
+    },
+    "permissions": [
+        "storage",
+        "https://meet.google.com/"
+    ]
+}

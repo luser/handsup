@@ -41,8 +41,18 @@ function findUsername() {
     }
 }
 
-function joinedMeeting() {
-    console.log('Joined meeting!');
+async function shouldJoin(room) {
+    let response = await fetch("https://jumbo-thorough-tenrec.gigalixirapp.com/room/" + room);
+    let responseAsText = await response.text();
+    console.log(`shouldJoin: ${responseAsText}`);
+    return responseAsText === 'true';
+}
+
+function startHandRaiser() {
+    if (i) {
+        // Already open
+        return;
+    }
     i = document.createElement("iframe");
     i.style.width = "300px";
     i.style.height = "calc(100% - 200px)";
@@ -51,8 +61,8 @@ function joinedMeeting() {
         url += `#${btoa(JSON.stringify({ room: room, person: name }))}`;
     }
     i.src = url;
-    i.style.zIndex=999;
-    i.style.position="fixed";
+    i.style.zIndex = 999;
+    i.style.position = "fixed";
     document.body.append(i);
     function popoutFn(a) {
         // console.log("postmessage data event", a);
@@ -65,7 +75,19 @@ function joinedMeeting() {
     window.addEventListener("message", popoutFn, false);
 }
 
+function joinedMeeting() {
+    console.log('Joined meeting!');
+    if (room) {
+        new Promise(async (resolve, reject) => {
+            if (await shouldJoin(room)) {
+                startHandRaiser();
+            }
+        });
+    }
+}
+
 function leftMeeting() {
+    console.log('Left meeting!');
     if (i) {
         document.body.removeChild(i);
         i = null;
@@ -89,7 +111,16 @@ function checkMeetingStatus() {
 
 // Don't bother running this unless we're at a meeting URL
 if (window.location.pathname != '/') {
-    room = window.location.pathname.substr(1);
+    chrome.runtime.sendMessage(null, "showAction");
+    const splits = window.location.pathname.split("/");
+    room = splits[splits.length - 1];
     findUsername();
     window.setInterval(checkMeetingStatus, 1000);
 }
+
+chrome.runtime.onMessage.addListener((message, sender, _) => {
+    console.log(`Got message '${message}'`);
+    if (message == "join") {
+        startHandRaiser();
+    }
+});

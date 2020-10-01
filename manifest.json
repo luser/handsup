@@ -10,18 +10,29 @@
         "48": "handsup48.png",
         "128": "handsup128.png"
     },
+    "background": {
+        "scripts": [
+            "background.js"
+        ],
+        "persistent": false
+    },
     "content_scripts": [
         {
             "matches": ["https://meet.google.com/*"],
             "js": ["content.js"]
         }
     ],
+    "page_action": {
+        "default_icon": "handsup32.png",
+        "default_title": "Join Speaking Queue"
+    },
     "options_ui": {
         "page": "options.html",
         "open_in_tab": false
     },
     "permissions": [
         "storage",
+        "declarativeContent",
         "https://meet.google.com/"
     ]
 }
